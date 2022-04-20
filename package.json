@@ -1,0 +1,30 @@
+{
+  "name": "totalrecall_backend",
+  "version": "1.0.0",
+  "description": "Total Recall - FrontEnd: React, Backend: Express, PSQL, NodeJS",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "Enrique Hoyos",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.26.1",
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.20.0",
+    "buffer": "^6.0.3",
+    "colors": "^1.4.0",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "crypto-browserify": "^3.12.0",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "jsonschema": "^1.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^8.7.3",
+    "pg-hstore": "^2.3.4",
+    "stream": "^0.0.2",
+    "util": "^0.12.4"
+  }
+}

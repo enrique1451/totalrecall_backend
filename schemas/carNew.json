@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "properties": {
+    
+    "yearmodel": {
+      "type": "integer",
+      "minLength": 1,
+      "maxLength": 50
+    },
+
+    "carmake": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 30
+    },
+    
+    "carmodel": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20
+    },   
+    "recalls": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 10,
+      "format": "string"
+    }
+        
+  },
+  "additionalProperties": false,
+  "required": [
+    "yearmodel",
+    "carmake",
+    "carmodel"
+  ]
+}
