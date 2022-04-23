@@ -23,7 +23,7 @@ const router = express.Router();
  * Authorization required: admin or same-user-as-:username
  * */
 
-router.post("/:username/garage", authenticateJWT , async function (req, res, next) {
+router.post("/garage", authenticateJWT , async function (req, res, next) {
 
     const decoded = decode(req.body._token)
     const username = decoded.username
@@ -48,16 +48,19 @@ router.post("/:username/garage", authenticateJWT , async function (req, res, nex
       }
     }),
 
-router.get("/:username/garage/showcars", authenticateJWT, async function (req, res, next) {
-    console.log(req.body, req.body._token)
+router.get("/garage/showcars", authenticateJWT, async function (req, res, next) {
+      let user = res.locals.user
 
-      try {
-        const cars = await Car.findAllCarsForUser(username);
+      try {       
+        console.log(user)
+
+        const cars = await Car.findAllCarsForUser(user.username);
         return res.json({ cars });
       } catch (err) {
         return next(err);
       }
     
+
     });
 
 

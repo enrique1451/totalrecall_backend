@@ -70,15 +70,18 @@ class Car {
 
   static async findAllCarsForUser(username) {
     const result = await db.query(
-          `SELECT carmake,
+          `SELECT 
+                  car_id, 
+                  carmake,
                   carmodel, 
                   yearmodel,
                   recalls
            FROM cars
-           INNER JOIN users_cars on users_cars.username WHERE username = $1  
+           LEFT JOIN users_cars on users_cars.username = $1  
            ORDER BY carmake`,
            [username]
     );
+    console.log(result.rows)
 
     return result.rows;
   }
