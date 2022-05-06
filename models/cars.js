@@ -25,9 +25,9 @@ class Car {
           (yearmodel,
             carmake,
             carmodel,           
-          recalls)
+            recalls)
         VALUES ($1, $2, $3, $4)
-        RETURNING id, yearmodel, carmake, carmodel`, 
+        RETURNING car_id, yearmodel, carmake, carmodel`, 
         [ 
           yearmodel,
           carmake,
@@ -35,15 +35,19 @@ class Car {
           recalls
         ],
       );
-      const carId = result.rows[0].id
+      const carId = result.rows[0].car_id
+      console.log("DATABASE ADD CAR CAR ID", carId)
       
       const preCheck = await db.query(
-        `SELECT id
+        `SELECT car_id
         FROM cars
-        WHERE id = $1`, [carId]);
+        WHERE car_id = $1`, [carId]);
         const car = preCheck.rows[0];
       
-      if (!car) throw new NotFoundError(`No car with: ${carId}`);
+      if (!car) 
+      throw new NotFoundError(`No car with: ${carId}`);
+      
+
       
       const preCheck2 = await db.query(
             `SELECT username
@@ -71,22 +75,25 @@ class Car {
   static async findAllCarsForUser(username) {
     const result = await db.query(
           `SELECT 
-                  car_id, 
                   carmake,
                   carmodel, 
                   yearmodel,
                   recalls
            FROM cars
-           LEFT JOIN users_cars on users_cars.username = $1  
+           JOIN users_cars 
+           ON users_cars.username = $1 
+           AND users_cars.car_id = cars.car_id  
            ORDER BY carmake`,
            [username]
     );
-    console.log(result.rows)
+    console.log("username line 89 cars model===>", username)
+    console.log("result from cars query in cars.models===>",result.rows)
 
     return result.rows;
   }
 
 }
+
 
 
 module.exports = Car;

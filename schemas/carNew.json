@@ -5,9 +5,9 @@
   "properties": {
     
     "yearmodel": {
-      "type": "integer",
-      "minLength": 1,
-      "maxLength": 50
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 4
     },
 
     "carmake": {

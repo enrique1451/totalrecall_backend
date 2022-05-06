@@ -1,24 +1,24 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "http://example.com/userAuth.json",
-  "type": "object",
-  "username": {
-    "$id": "/properties/username",
-    "type": "string",
-    "title": "The Username Schema ",
-    "default": ""
-  },
-  "password": {
-    "$id": "/properties/password",
-    "type": "string",
-    "title": "The Password Schema ",
-    "default": ""
-
-  },
-  
-  "additionalProperties": false,
-  "required": [
-    "username",
-    "password"
-  ]
+  "properties": {
+      "username": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 30
+      },
+      "password": {
+        "type": "string",
+        "title": "Pwd Schema ",
+        "default": "",
+        "minLength": 5,
+        "maxLength": 55,
+        "pattern": "^[a-zA-Z 0-9!#%$&'()*+,./:;<=>?@^\\_`{|}~\\-]*$",
+        "examples": [
+        ]
+      },
+      "additionalProperties": false,
+      "required": [
+        "username",
+        "password"
+      ]
+    }
 }

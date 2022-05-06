@@ -27,23 +27,23 @@ const router = express.Router();
  * Authorization required: admin
  **/
 
-router.post("/", ensureAdmin, async function (req, res, next) {
-  try {
-    const validator = jsonschema.validate(req.body, userNewSchema);
-    if (!validator.valid) {
-      const errs = validator.errors.map(e => e.stack);
-      throw new BadRequestError(errs);
-    }
+// router.post("/", ensureAdmin, async function (req, res, next) {
+//   try {
+//     const validator = jsonschema.validate(req.body, userNewSchema);
+//     if (!validator.valid) {
+//       const errs = validator.errors.map(e => e.stack);
+//       throw new BadRequestError(errs);
+//     }
 
-    const user = await User.register(req.body);
-    const token = createToken(user);
+//     const user = await User.register(req.body);
+//     const token = createToken(user);
 
-    return res.status(201).json({ user, token });
-    } catch (err) {
-      return next(err);
-      }
+//     return res.status(201).json({ user, token });
+//     } catch (err) {
+//       return next(err);
+//       }
 
-});
+// });
 
 
 /** POST / { user }  => { user, token }
@@ -63,24 +63,24 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 });
 
 
-/** GET / => { users: [ {username, fullname, email }, ... ] }
- *
- * Returns list of all users.
- *
- * Authorization required: admin
- **/
+// /** GET / => { users: [ {username, fullname, email }, ... ] }
+//  *
+//  * Returns list of all users.
+//  *
+//  * Authorization required: admin
+//  **/
 
-router.get("/", ensureAdmin, async function (req, res, next) {
-  try {
-    const users = await User.findAll();
-    return res.json({ users });
-    } catch (err) {
-      return next(err);
-      }
-});
+// router.get("/", ensureAdmin, async function (req, res, next) {
+//   try {
+//     const users = await User.findAll();
+//     return res.json({ users });
+//     } catch (err) {
+//       return next(err);
+//       }
+// });
 
 
-/** GET /[username] => { user }
+/** GET / => { user }
  *
  * Returns { username, fullName, isAdmin}
  *
@@ -91,10 +91,10 @@ router.get("/", ensureAdmin, async function (req, res, next) {
  * username and token are consistent and valid, otherwise returns error.  
  **/
 
-router.get("/:username", authenticateJWT, async function (req, res, next) {
+router.get("/", authenticateJWT, async function (req, res, next) {
+  let userData = res.locals.user
   try {
-    const user = await User.get(req.params.username);
-    console.log(user)
+    const user = await User.get(userData.username);
     return res.json({ user });
     } catch (err) {
       return next(err);
