@@ -4,21 +4,21 @@
 const express = require("express");
 const http = require("http");
 const https = require("https");
-const path = require("path")
-
+const path = require("path");
+const qs = require("qs");
+const assert = require("assert");
 const cors = require("cors");
 
 const { NotFoundError } = require("./expressError");
 const { authenticateJWT } = require("./middleware/auth");
 
-const carsApiProxy = require("./middleware/carsProxy")
+const carsApiProxy = require("./middleware/carsProxy");
 const authRoutes = require("./routes/auth");
 const carsRoutes = require("./routes/cars");
 const usersRoutes = require("./routes/users");
 const morgan = require("morgan");
-// const { passDataToProxy, passDataToNext } = require("./middleware/proxyObjectHandler");
 const app = express();
-const router = express.Router()
+
 
 app.use(cors({
   origin: "http://localhost:3000"
@@ -31,7 +31,7 @@ app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
 app.use("/cars", carsRoutes);
 
-app.use("/recalls", carsApiProxy)
+app.use("/recalls/recallsByVehicle/", carsApiProxy);
 
 
 /** Handle 404 errors -- this matches everything */

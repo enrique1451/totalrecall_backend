@@ -56,7 +56,7 @@ router.get("/garage/showcars", authenticateJWT, async function (req, res, next) 
 
       try {
         const cars = await Car.findAllCarsForUser(username); 
-        return res.json({ cars });        
+        return res.json({ cars });
       } catch (err) {
         return next(err);
       }
@@ -64,13 +64,10 @@ router.get("/garage/showcars", authenticateJWT, async function (req, res, next) 
 
 
 router.get("/recalls/recallsByVehicle/", carsApiProxy, async function (req, res, next) {
-
-  
-     
-
+  console.log(req.query)
   
   try { 
-    
+       
         return res.json({ recalls });
       } catch (err) {
         return next(err);
