@@ -3,17 +3,8 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const options = {
     /** @type {import('http-proxy-middleware/dist/types').Options} */
     target: 'https://api.nhtsa.gov/', // target host with the same base path
-    // target: "www.blahblah.com",    
-    changeOrigin: true, // needed for virtual hosted sites
-    // onProxyReq(proxyReq, req, res) {
-    //   proxyReq.path =+ '?'
       
-    // }
-
-
-
-
-
+    changeOrigin: true, // needed for virtual hosted sites
     }   
     
     
