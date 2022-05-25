@@ -4,7 +4,8 @@
   "description": "Total Recall - FrontEnd: React, Backend: Express, PSQL, NodeJS",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "heroku-postbuild": "npm run build"
   },
   "keywords": [],
   "author": "Enrique Hoyos",

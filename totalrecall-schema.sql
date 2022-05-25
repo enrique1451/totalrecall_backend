@@ -12,18 +12,16 @@ CREATE TABLE users (
 CREATE TABLE cars (
   car_id SERIAL PRIMARY KEY,
   yearmodel INTEGER NOT NULL 
-    CHECK (yearmodel > 1980),
+    CHECK (yearmodel > 1950),
   carmake TEXT NOT NULL,
-  carmodel TEXT NOT NULL,
-  recalls TEXT   
+  carmodel TEXT NOT NULL
+     
 );
 
 
 CREATE TABLE users_cars (
   id SERIAL PRIMARY KEY,
-  username VARCHAR(30)
-    REFERENCES users(username) ON DELETE CASCADE,
-  car_id INTEGER 
-    REFERENCES cars(car_id) ON DELETE CASCADE
+  username VARCHAR(30) REFERENCES users ON DELETE CASCADE,
+  car_id INTEGER REFERENCES cars ON DELETE CASCADE
 )
   

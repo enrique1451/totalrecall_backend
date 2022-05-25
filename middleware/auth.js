@@ -44,22 +44,6 @@ function ensureLoggedIn(req, res, next) {
 }
 
 
-/** Middleware to use when they be logged in as an admin user.
- *
- *  If not, raises Unauthorized.
- */
-
-function ensureAdmin(req, res, next) {
-  try {
-    console.log(res.locals.user)
-    if (!res.locals.user || !res.locals.user.isAdmin) {
-      throw new UnauthorizedError();
-    }
-    return next();
-  } catch (err) {
-    return next(err);
-  }
-}
 
 /** Middleware to use when a valid token must be provided & be user matching
  *  username provided as route param.
@@ -71,14 +55,13 @@ function ensureAdmin(req, res, next) {
 
 function ensureCorrectUserOrAdmin(req, res, next) {
   try {
-    const tokenStr = req.body._token || req.query._token;
-    let token = jwt.verify(tokenStr, SECRET_KEY);
-    req.username = token.username; 
-    console.debug(token.isAdmin, token.username, res.locals.user)
-    
 
-    if (!(token && (token.isAdmin || token.username === req.params.username))) {
-      
+    const tokenStr = req.body._token || req.query._token;  //from address bar
+    let token = jwt.verify(tokenStr, SECRET_KEY);
+    let headersToken = jwt.verify(req.headers.authorization, SECRET_KEY)
+    req.username = token.username; 
+
+    if (!(token && (token.isAdmin || token.username === headersToken.username))) {
       throw new UnauthorizedError();
     }
     return next();
@@ -91,6 +74,5 @@ function ensureCorrectUserOrAdmin(req, res, next) {
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
-  ensureAdmin,
   ensureCorrectUserOrAdmin,
 };

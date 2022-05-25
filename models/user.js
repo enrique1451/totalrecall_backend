@@ -44,7 +44,6 @@ class User {
         return user;
       }
     }
-
     throw new UnauthorizedError("Invalid username/password");
   }
 
@@ -93,24 +92,6 @@ class User {
     return user;
   }
 
-  /** Find all users.
-   *
-   * Returns [{ username, full_name, , email, is_admin }, ...]
-   * must be admin to access this route/
-
-  static async findAll() {
-    const result = await db.query(
-          `SELECT username,
-                  full_name AS "fullName",
-                  email,
-                  is_admin AS "isAdmin"
-           FROM users
-           ORDER BY username`,
-    );
-
-    return result.rows;
-  }
-
   /** Given a username, return data about user.
    *
    * Returns { username, full_name,is_admin }
@@ -131,6 +112,7 @@ class User {
     );
 
     const user = userRes.rows[0];
+    console.log("Return user from models file",user)
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
   }

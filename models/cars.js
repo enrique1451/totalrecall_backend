@@ -75,10 +75,11 @@ class Car {
   static async findAllCarsForUser(username) {
     const result = await db.query(
           `SELECT 
-                  carmake,
-                  carmodel, 
-                  yearmodel,
-                  recalls
+                  cars.car_id,
+                  cars.carmake,
+                  cars.carmodel, 
+                  cars.yearmodel,
+                  cars.recalls
            FROM cars
            JOIN users_cars 
            ON users_cars.username = $1 
@@ -86,14 +87,32 @@ class Car {
            ORDER BY carmake`,
            [username]
     );
-    console.log("username line 89 cars model===>", username)
+    // console.log("username line 89 cars model===>", username)
     console.log("result from cars query in cars.models===>",result.rows)
 
     return result.rows;
   }
 
+/*
+* Removes selected car from car garage for the current logged in user 
+*/
+
+
+  static async removeCarFromUserAccount(car_id) {
+    console.log(car_id)
+    const result = await db.query(
+      `DELETE FROM cars
+              WHERE car_id = $1
+              RETURNING yearmodel, carmake, carmodel`,
+       [car_id]);
+
+
+    if (result.rows.length === 0) {
+      let notFound = new Error(`There exists no car with ${car_id}`);
+      notFound.status = 404;
+      throw notFound;
+    }
+  }  
 }
-
-
 
 module.exports = Car;
