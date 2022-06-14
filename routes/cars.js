@@ -9,25 +9,24 @@ const { ensureCorrectUserOrAdmin } = require("../middleware/auth");
 const { decode } = require("jsonwebtoken");
 
 
-const Car = require("../models/cars")
+const Car = require("../models/cars");
 const carNewSchema = require("../schemas/carNew.json");
 const carsApiProxy = require("../middleware/carsProxy");
 const router = express.Router();
 
 
- /** POST /cars/garage 
- *
- * Returns {"new car": carmake, model }
- *
- * Authorization required: admin or same-user-as-:username
- * */
+ /** POST /cars/garage/showcars 
+  * Returns {"new car": modelyear, carmake, carmodel }
+  * Authorization required: same-user-as-decoded token:username
+ */
 
-router.post("/garage", ensureCorrectUserOrAdmin , async function (req, res, next) {
+router.post("/garage/showcars", ensureCorrectUserOrAdmin , async function (req, res, next) {
+    delete req.body._token
 
-    const decoded = decode(req.body._token)
+    const decoded = decode(req.headers.authorization)
     const username = decoded.username
     
-    delete req.body._token
+    
     try {
       const validation = jsonschema.validate(req.body, carNewSchema) 
 
@@ -37,10 +36,9 @@ router.post("/garage", ensureCorrectUserOrAdmin , async function (req, res, next
           message: validation.errors.map(err => err.stack)
         });
       }
-        const car = await Car.addCarToGarage(req.body, username);
-        return res.status(201).json({car});
+        const addedCar = await Car.addCarToGarage(req.body, username);
+        return res.status(201).json({addedCar});
       }
-
       catch(err) {
         return next(err);
       }
@@ -48,16 +46,15 @@ router.post("/garage", ensureCorrectUserOrAdmin , async function (req, res, next
 
 /*
 Route that queries database and returns all cars belonging to a user called from "getUserCars"
-method at totalRecallApi
+method at totalRecallApi in the frontend
 */     
 router.get("/garage/showcars", ensureCorrectUserOrAdmin, async function (req, res, next) {
       const decoded = decode(req.headers.authorization)
       const username = decoded.username
 
-
       try {
         const cars = await Car.findAllCarsForUser(username); 
-        console.log("Line 60 from cars.js(routes)", cars)
+        console.debug("Line 60 from cars.js(routes)", cars)
         return res.json({ cars });
       } catch (err) {
         return next(err);
@@ -73,11 +70,13 @@ router.get("/garage/showcars", ensureCorrectUserOrAdmin, async function (req, re
 router.delete("/garage/showcars", ensureCorrectUserOrAdmin, async function (req, res, next) {
   const decoded = decode(req.headers.authorization)
   const username = decoded.username
-  const car = req.body.car.car_id
+  const car_id = req.body.car.car_id
+  const carDeleted = req.body.car
+  
 
   try {
-    const cars = await Car.removeCarFromUserAccount(car, username); 
-    return res.json({ cars });
+    const car = await Car.removeCarFromUserAccount(car_id, username); 
+    return res.json({ carDeleted });
   } catch (err) {
     return next(err);
   }
@@ -86,7 +85,7 @@ router.delete("/garage/showcars", ensureCorrectUserOrAdmin, async function (req,
 
 
 /*
-Route that queries NHTSA API via proxy to avoid CORS errors
+Route that queries NHTSA API, via proxy middleware in carApiProxy
 */     
 
 router.get("/recalls/recallsByVehicle/", carsApiProxy, async function (req, res, next) {
@@ -97,6 +96,6 @@ router.get("/recalls/recallsByVehicle/", carsApiProxy, async function (req, res,
     } catch (err) {
       return next(err);
       }
-    });
+  });
 
 module.exports = router;

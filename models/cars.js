@@ -1,7 +1,7 @@
 "use strict";
 
 const db = require("../db");
-const { NotFoundError } = require("../expressError");
+const { NotFoundError, BadRequestError } = require("../expressError");
 
 
 /** Related functions for cars. */
@@ -9,67 +9,68 @@ const { NotFoundError } = require("../expressError");
 class Car {
 
 
-  /** Given a user Find all cars in the user's garage.
+  /** Signed in user add car into his/her account. 
    *
-   * Returns [{ carmake, carmodel, yearmodel, recalls}, ...]
-   * 
+   * Returns [{ carmake, carmodel, yearmodel}, ...]
    * 
    **/
 
   static async addCarToGarage(
-    {yearmodel, carmake, carmodel, recalls}, username) {
+    {yearmodel, carmake, carmodel}, username) {
       if (!username) throw new NotFoundError(`Username not defined: ${username}`)
-      
+
+      // const carExists = await db.query(
+      //  `SELECT car_id
+      //   FROM cars
+      //   WHERE yearmodel = $1,
+      //         carmake  = $2,
+      //         carmodel = $3`,
+      //            [
+      //             yearmodel, 
+      //             carmake,
+      //             carmodel
+      //           ]
+      //         );
+
+      //   if (carExists) throw new BadRequestError(`Car ${yearmodel} ${carmake} ${carmodel} Already Exists`);
+      const preCheck2 = await db.query(
+        `SELECT username
+          FROM users
+          WHERE username = $1`, [username]);
+  const user = preCheck2.rows[0];
+  
+  if (!user) throw new NotFoundError(`No username: ${username}`);
+
       const result = await db.query(
         `INSERT INTO cars
           (yearmodel,
             carmake,
-            carmodel,           
-            recalls)
-        VALUES ($1, $2, $3, $4)
+            carmodel
+            )
+        VALUES ($1, $2, $3)
         RETURNING car_id, yearmodel, carmake, carmodel`, 
         [ 
           yearmodel,
           carmake,
           carmodel,
-          recalls
-        ],
+         ]
       );
+      const addedCar = result.rows[0]
       const carId = result.rows[0].car_id
-      console.log("DATABASE ADD CAR CAR ID", carId)
-      
-      const preCheck = await db.query(
-        `SELECT car_id
-        FROM cars
-        WHERE car_id = $1`, [carId]);
-        const car = preCheck.rows[0];
-      
-      if (!car) 
-      throw new NotFoundError(`No car with: ${carId}`);
-      
-
-      
-      const preCheck2 = await db.query(
-            `SELECT username
-              FROM users
-              WHERE username = $1`, [username]);
-      const user = preCheck2.rows[0];
-      
-      if (!user) throw new NotFoundError(`No username: ${username}`);
+      console.log("DATABASE ADD CAR CAR ID", carId, addedCar)
   
       await db.query(
             `INSERT INTO users_cars (car_id, username)
               VALUES ($1, $2)`,
           [carId, username]);
+
+      return addedCar;
     }
         
       
-    /** Given a user Find all cars in the user's garage.
-   *
-   * Returns [{ carmake, carmodel, yearmodel, recalls}, ...]
-   * 
-   * 
-   **/
+  /* Given a user Find all cars in the user's garage.
+   * Returns [{ carmake, carmodel, yearmodel}, ...]
+   */
 
 
   static async findAllCarsForUser(username) {
@@ -97,7 +98,6 @@ class Car {
 * Removes selected car from car garage for the current logged in user 
 */
 
-
   static async removeCarFromUserAccount(car_id) {
     console.log(car_id)
     const result = await db.query(
@@ -106,12 +106,14 @@ class Car {
               RETURNING yearmodel, carmake, carmodel`,
        [car_id]);
 
-
+       const car = result.rows[0]
+       
     if (result.rows.length === 0) {
       let notFound = new Error(`There exists no car with ${car_id}`);
       notFound.status = 404;
       throw notFound;
     }
+    return car; 
   }  
 }
 
