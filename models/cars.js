@@ -9,7 +9,7 @@ const { NotFoundError, BadRequestError } = require("../expressError");
 class Car {
 
 
-  /* Signed in user add car into his/her account. 
+  /* Signed in user add car user account. 
    * Returns [{ carmake, carmodel, yearmodel}, ...]   * 
    */
 
@@ -45,17 +45,37 @@ class Car {
       const carId = result.rows[0].car_id
       // console.log("DATABASE ADD CAR CAR ID", carId, addedCar)
   
-      const linkResult = await db.query(
+      await db.query(
             `INSERT INTO users_cars (car_id, username)
               VALUES ($1, $2)
               RETURNING users_cars.id `,
           [carId, username]);
 
-      // console.log(linkId)
 
       return carId;
     }
-        
+  
+   /*
+    * Removes selected car from car garage for the current logged in user 
+    */
+
+  static async removeCarFromUserAccount(car_id) {
+    // console.log(car_id)
+    const result = await db.query(
+      `DELETE FROM cars
+              WHERE car_id = $1
+              RETURNING yearmodel, carmake, carmodel`,
+      [car_id]);
+
+      const car = result.rows[0]
+      
+    if (result.rows.length === 0) {
+      let notFound = new Error(`There exists no car with ${car_id}`);
+      notFound.status = 404;
+      throw notFound;
+    }
+    return car; 
+  }  
       
   /* Given a user Find all cars in the user's garage.
    * Returns [{ carmake, carmodel, yearmodel}, ...]
@@ -82,27 +102,7 @@ class Car {
     return result.rows;
   }
 
-/*
-* Removes selected car from car garage for the current logged in user 
-*/
 
-  static async removeCarFromUserAccount(car_id) {
-    // console.log(car_id)
-    const result = await db.query(
-      `DELETE FROM cars
-              WHERE car_id = $1
-              RETURNING yearmodel, carmake, carmodel`,
-       [car_id]);
-
-       const car = result.rows[0]
-       
-    if (result.rows.length === 0) {
-      let notFound = new Error(`There exists no car with ${car_id}`);
-      notFound.status = 404;
-      throw notFound;
-    }
-    return car; 
-  }  
 }
 
 module.exports = Car;

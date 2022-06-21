@@ -2,11 +2,6 @@
 /** Express app for totalrecall. */
 
 const express = require("express");
-const http = require("http");
-const https = require("https");
-const path = require("path");
-const qs = require("qs");
-const assert = require("assert");
 const cors = require("cors");
 
 const { NotFoundError } = require("./expressError");
@@ -30,7 +25,6 @@ app.use(authenticateJWT);
 app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
 app.use("/cars", carsRoutes);
-
 app.use("/recalls/recallsByVehicle/", carsApiProxy);
 
 

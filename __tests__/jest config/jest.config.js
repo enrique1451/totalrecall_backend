@@ -49,16 +49,6 @@ async function beforeAllFunction() {
   }
 }
 
-async function afterEachFunction() {
-  try {
-    await db.query("DELETE FROM users");
-    await db.query("DELETE FROM cars");
-    await db.query("DELETE FROM users_cars");
-  } catch (error) {
-    console.error(error);
-  } 
-
-}
 
 async function afterAllFunction() {
   try {
@@ -76,8 +66,7 @@ async function afterAllFunction() {
 }
 
 module.exports = {
-  afterAllFunction,
-  afterEachFunction,
   TEST_DATA,
+  afterAllFunction,
   beforeAllFunction,
 };

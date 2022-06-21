@@ -16,11 +16,6 @@ beforeAll(async function () {
 });
 
 
-// afterEach(async function () {
-//   await afterEach();
-// });
-
-
 afterAll(async function () {
   await afterAllFunction();
 });

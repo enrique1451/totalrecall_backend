@@ -3,7 +3,6 @@
 /** Routes for cars. */
 
 const jsonschema = require("jsonschema");
-
 const express = require("express");
 const { ensureCorrectUserOrAdmin } = require("../middleware/auth");
 const { decode } = require("jsonwebtoken");
@@ -16,8 +15,7 @@ const router = express.Router();
 
 
 /*
-Route that queries database and returns all cars belonging to a user called from "getUserCars"
-method at totalRecallApi in the frontend
+Route that queries database and returns all cars belonging to a user called from "getUserCars" method at totalRecallApi in the frontend
 */     
 router.get("/garage/showcars", ensureCorrectUserOrAdmin, async function (req, res, next) {
 

@@ -1,0 +1,9 @@
+{
+  "files.exclude": {
+    "schemas/userUpdate.json": true,
+    "totalrecall-schema.sql": true,
+    "totalrecall.sql": true,
+    "package.json": true,
+    "package-lock.json": true
+  }
+}

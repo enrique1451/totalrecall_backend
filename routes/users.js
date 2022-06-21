@@ -33,9 +33,8 @@ const { createToken } = require("../helpers/tokens");
 
 /** GET / => { user }
  * Returns { username, fullName, isAdmin}
- * Authorization required: admin or same user-as-username in decoded token
- * Calls "/middleware/auth.js" at "ensureCorrectUserOrAdmin" to verify that 
- * username and token are consistent and valid, otherwise returns error.  
+ * Authorization required: admin(not functional yet) or same user-as-username in decoded token
+ * Calls "/middleware/auth.js" at "ensureCorrectUserOrAdmin" to verify token 
  **/
 
 router.get("/", ensureCorrectUserOrAdmin, async function (req, res, next) {
@@ -49,8 +48,6 @@ router.get("/", ensureCorrectUserOrAdmin, async function (req, res, next) {
       return next(err);
       }
 });
-
-
 
 
 module.exports = router;
