@@ -2,8 +2,6 @@
 
 const express = require("express");
 const router = express.Router();
-const jsonschema = require("jsonschema");
-const userUpdateSchema = require("../schemas/userUpdate.json");
 const User = require("../models/user");
 const { ensureCorrectUserOrAdmin} = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
@@ -42,7 +40,7 @@ const { createToken } = require("../helpers/tokens");
 
 router.get("/", ensureCorrectUserOrAdmin, async function (req, res, next) {
   let userData = res.locals.user
-  console.log("res.locals.user", userData)
+  // console.log("res.locals.user", userData)
   
   try {
     const user = await User.get(userData.username);

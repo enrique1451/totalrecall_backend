@@ -15,51 +15,54 @@ const carsApiProxy = require("../middleware/carsProxy");
 const router = express.Router();
 
 
+/*
+Route that queries database and returns all cars belonging to a user called from "getUserCars"
+method at totalRecallApi in the frontend
+*/     
+router.get("/garage/showcars", ensureCorrectUserOrAdmin, async function (req, res, next) {
+
+  const decoded = decode(req.headers.authorization)
+  const username = decoded.username
+
+  try {
+    const cars = await Car.findAllCarsForUser(username); 
+    console.log("Line 60 from cars.js(routes)", cars)
+    return res.json({ cars });
+  } catch (err) {
+    return next(err);
+  }
+    });
+
  /** POST /cars/garage/showcars 
   * Returns {"new car": modelyear, carmake, carmodel }
   * Authorization required: same-user-as-decoded token:username
  */
 
 router.post("/garage/showcars", ensureCorrectUserOrAdmin , async function (req, res, next) {
-    delete req.body._token
+  delete req.body._token
 
-    const decoded = decode(req.headers.authorization)
-    const username = decoded.username
-    
-    
-    try {
-      const validation = jsonschema.validate(req.body, carNewSchema) 
+  const decoded = decode(req.headers.authorization)
+  const username = decoded.username
 
-      if (!validation.valid) {
-        return next({
-          status: 400, 
-          message: validation.errors.map(err => err.stack)
-        });
-      }
-        const addedCar = await Car.addCarToGarage(req.body, username);
-        return res.status(201).json({addedCar});
-      }
-      catch(err) {
-        return next(err);
-      }
-    }),
+ 
+  try {
+    const validation = jsonschema.validate(req.body, carNewSchema) 
 
-/*
-Route that queries database and returns all cars belonging to a user called from "getUserCars"
-method at totalRecallApi in the frontend
-*/     
-router.get("/garage/showcars", ensureCorrectUserOrAdmin, async function (req, res, next) {
-      const decoded = decode(req.headers.authorization)
-      const username = decoded.username
+    if (!validation.valid) {
+      return next({
+        status: 400, 
+        message: validation.errors.map(err => err.stack)
+      });
+    }
+      const addedCar = await Car.addCarToGarage(req.body, username);
+      return res.status(201).json({addedCar});
+    }
+    catch(err) {
+      return next(err);
+    }
+  }),
 
-      try {
-        const cars = await Car.findAllCarsForUser(username); 
-        console.debug("Line 60 from cars.js(routes)", cars)
-        return res.json({ cars });
-      } catch (err) {
-        return next(err);
-      }
-    });
+
 
 
 /*
@@ -85,11 +88,11 @@ router.delete("/garage/showcars", ensureCorrectUserOrAdmin, async function (req,
 
 
 /*
-Route that queries NHTSA API, via proxy middleware in carApiProxy
+Query route for NHTSA API, via proxy middleware in carApiProxy
 */     
 
 router.get("/recalls/recallsByVehicle/", carsApiProxy, async function (req, res, next) {
-  console.log(req.query)
+  // console.log(req.query)
   
   try {
     return res.json({ recalls });

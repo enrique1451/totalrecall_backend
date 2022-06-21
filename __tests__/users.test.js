@@ -2,72 +2,70 @@
 const request = require("supertest");
 
 // app imports
-const app = require("../../app");
+const app = require("../app");
+const db = require("../db");
 
-// model imports
-const User = require("../../models/user");
 
 const {
   TEST_DATA,
-  afterEachHook,
-  afterAllHook,
-  beforeAllHook,
-  beforeEachHook
-} = require("./config");
+  afterEachFunction,
+  afterAllFunction,
+  beforeAllFunction,
+} = require("./jest config/jest.config");
 
 
 beforeAll(async function () {
-  await beforeAllHook();
-});
-
-
-beforeEach(async function () {
-  await beforeEachHook(TEST_DATA);
+  await beforeAllFunction();
 });
 
 
 afterEach(async function () {
-  await afterEachHook();
+  await afterEachFunction();
 });
 
-
-afterAll(async function () {
-  await afterAllHook();
-});
-
-
-describe("POST /auth/register", async function () {
+describe("Test Multiple User's Routes", function () {
   test("Creates a new user", async function () {
-    let dataObj = {
-      username: "benito",
+   
+    let newUser = {
+      username: "tester",
       password: "foo123",
-      fullName: "benito cabrera",
-      email: "benito@benitoca.com",
+      fullName: "tester McTest",
+      email: "awesome@mctests.com",
     };
     const response = await request(app)
         .post("/auth/register")
-        .send(dataObj);
+        .send(newUser);
+    // console.log(response)
     expect(response.statusCode).toBe(201);
     expect(response.body).toHaveProperty("token");
-    const benitoSavedInDb = await User.findOne("benito");
-    ["username", "isAdmin"].forEach(key => {
-      expect(dataObj[key]).toEqual(benitoSavedInDb[key]);
-    });
   });
 
   test("Prevents creating a user with duplicate username", async function () {
     const response = await request(app)
-
-    
         .post("/auth/register")
         .send({
-          username: "test",
+          username: "tester",
           password: "test123",
           full_name: "tester mcfly",
           email: 'savvy@test.com',
         });
-    expect(response.statusCode).toBe(409);
+    expect(response.statusCode).toBe(400);
   });
+
+
+
+  test("Rejects user with wrong password to log in", async function() {
+    const response = await request(app)
+      .post("/users/login")
+      .send({
+        username: "tester", 
+        password: "blahblahblah"
+      })
+    expect(response.statusCode).toBe(401)
+    expect(response.body).toHaveProperty("error")
+
+      
+  })  
 
   test("Prevents creating a user without required password field", async function () {
     const response = await request(app)
@@ -75,33 +73,22 @@ describe("POST /auth/register", async function () {
         .send({
             username: "test",
             password: "",
-            full_name: "Proof's Working",
+            full_name: "Idon't HaveAPassword˚",
             email: "test@reallyworks.com",
           });
     expect(response.statusCode).toBe(400);
-  });
-});
 
-
-describe("GET /users", async function () {
-  test("Gets a list of 1 user", async function () {
-    const response = await request(app)
-        .get("/users")
-        .send({_token: `${TEST_DATA.userToken}`});
-    expect(response.body.users).toHaveLength(1);
-    expect(response.body.users[0]).toHaveProperty("username");
-    expect(response.body.users[0]).not.toHaveProperty("password");
+    await db.query("DELETE FROM users");
+    await db.query("DELETE FROM cars");
+    await db.end()
   });
+
 });
 
 
 
-  test("Responds with a 404 if it cannot find the user in question", async function () {
-    const response = await request(app)
-        .get(`/users`)
-        .send({_token: `${TEST_DATA.userToken}`});
-    expect(response.statusCode).toBe(404);
-  });
+
+
 
 
 

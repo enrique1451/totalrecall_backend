@@ -9,41 +9,27 @@ const { NotFoundError, BadRequestError } = require("../expressError");
 class Car {
 
 
-  /** Signed in user add car into his/her account. 
-   *
-   * Returns [{ carmake, carmodel, yearmodel}, ...]
-   * 
-   **/
+  /* Signed in user add car into his/her account. 
+   * Returns [{ carmake, carmodel, yearmodel}, ...]   * 
+   */
 
   static async addCarToGarage(
     {yearmodel, carmake, carmodel}, username) {
       if (!username) throw new NotFoundError(`Username not defined: ${username}`)
 
-      // const carExists = await db.query(
-      //  `SELECT car_id
-      //   FROM cars
-      //   WHERE yearmodel = $1,
-      //         carmake  = $2,
-      //         carmodel = $3`,
-      //            [
-      //             yearmodel, 
-      //             carmake,
-      //             carmodel
-      //           ]
-      //         );
-
-      //   if (carExists) throw new BadRequestError(`Car ${yearmodel} ${carmake} ${carmodel} Already Exists`);
-      const preCheck2 = await db.query(
+      const preCheck = await db.query(
         `SELECT username
           FROM users
           WHERE username = $1`, [username]);
-  const user = preCheck2.rows[0];
+
+      const user = preCheck.rows[0];
   
   if (!user) throw new NotFoundError(`No username: ${username}`);
 
       const result = await db.query(
         `INSERT INTO cars
-          (yearmodel,
+          (
+            yearmodel,
             carmake,
             carmodel
             )
@@ -55,16 +41,19 @@ class Car {
           carmodel,
          ]
       );
-      const addedCar = result.rows[0]
+
       const carId = result.rows[0].car_id
-      console.log("DATABASE ADD CAR CAR ID", carId, addedCar)
+      // console.log("DATABASE ADD CAR CAR ID", carId, addedCar)
   
-      await db.query(
+      const linkResult = await db.query(
             `INSERT INTO users_cars (car_id, username)
-              VALUES ($1, $2)`,
+              VALUES ($1, $2)
+              RETURNING users_cars.id `,
           [carId, username]);
 
-      return addedCar;
+      // console.log(linkId)
+
+      return carId;
     }
         
       
@@ -79,8 +68,7 @@ class Car {
                   cars.car_id,
                   cars.carmake,
                   cars.carmodel, 
-                  cars.yearmodel,
-                  cars.recalls
+                  cars.yearmodel
            FROM cars
            JOIN users_cars 
            ON users_cars.username = $1 
@@ -89,7 +77,7 @@ class Car {
            [username]
     );
     // console.log("username line 89 cars model===>", username)
-    console.log("result from cars query in cars.models===>",result.rows)
+    // console.log("result from cars query in cars.models===>",result.rows)
 
     return result.rows;
   }
@@ -99,7 +87,7 @@ class Car {
 */
 
   static async removeCarFromUserAccount(car_id) {
-    console.log(car_id)
+    // console.log(car_id)
     const result = await db.query(
       `DELETE FROM cars
               WHERE car_id = $1

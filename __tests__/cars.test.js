@@ -2,70 +2,53 @@
 const request = require("supertest");
 
 // app imports
-const app = require("../../app");
-
-// model imports
-const User = require("../../models/user");
+const app = require("../app");
 
 const {
   TEST_DATA,
-  afterEachHook,
-  afterAllHook,
-  beforeEachHook
-} = require("./config");
+  afterAllFunction,
+  beforeAllFunction
 
+} = require("./jest config/jest.config");
 
-beforeEach(async function () {
-  await beforeEachHook(TEST_DATA);
+beforeAll(async function () {
+  await beforeAllFunction();
 });
 
 
-afterEach(async function () {
-  await afterEachHook();
-});
+// afterEach(async function () {
+//   await afterEach();
+// });
 
 
 afterAll(async function () {
-  await afterAllHook();
+  await afterAllFunction();
 });
 
 
-describe("POST /garage/showcars", async function () {
-  test("Creates a new car", async function () {
-    let dataObj = {
-      modelyear: "2020",
-      carmake: "yugo",
-      carnodel: "trash",
-      };
-    const response = await request(app)
-        .post("/garage/showcars")
-        .send(dataObj);
-    expect(response.statusCode).toBe(201);
-    expect(response.body).toHaveProperty("car_id");
-  });
-
-  test("Gets all cars for current user", async function () {
+describe("Tests Cars Routes and Data Entry into PostgreDB",  function () {
+  test("Gets all cars for current user",  async function () {
     const response = await request(app)    
-        .get("/garage/showcars")
-        .send({
-          _token: `${TEST_DATA.userToken}`
-        });
+        .get(`/cars/garage/showcars?_token=${TEST_DATA.token}`)
+        .set({"authorization":`${TEST_DATA.token}`})
+        
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("cars")
 
+
   });
+
   test("Delete selected car for logged in User", async function () {
-    const response = await request(app)    
-        .delete("/garage/showcars")
-        .send({
-          car: {
-            modelyear: "2020",
-            carmake: "yugo",
-            carnodel: "trash" },               
-        _token: `${TEST_DATA}.userToken`
-        });
+    const responseDelete = await request(app)
+          .delete(`/cars/garage/showcars?_token=${TEST_DATA.token}`)
+          .set({"authorization":`${TEST_DATA.token}`})
+          .send({
+            car: { car_id: `${TEST_DATA.carId}`, carmake: 'fake', carmodel: 'car', yearmodel: 2022 }
+            
+          });
     expect(response.statusCode).toBe(200);
-    expect(response.body.carDeleted).toHaveProperty("car_id")
+    expect(responseDelete.body).toHaveProperty("carDeleted")
+   
 
   });
 
